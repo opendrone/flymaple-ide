@@ -9,16 +9,14 @@
  */
 
 
-#include "wirish.h"
-
-#define PWM_PIN 2
-
+#include "main.h"
 #include "i2c.h"
 #include "config.h"
 #include "qctest.h"
 #include "ITG3205.h"
 #include "ADXL345.h"
 #include "BMP085.h"
+#include "motor.h"
 
 #define BS '\b'
 
@@ -45,6 +43,7 @@ void setup()
     Serial2.begin(9600);
     Serial2.println("Hello world!");
 
+    motorInit();//电机控制初始化 
     i2c_master_enable(I2C1, 0);
     initAcc();  
     initGyro();
@@ -102,7 +101,7 @@ void loop()
          /* clear screen for standard PTY terminal  "\033[1H\033[2J " */
         SerialUSB.println("\33[2J");
         
-        SerialUSB.println("\n\r >> OpenDrone Flymaple 1.0 << ");
+        SerialUSB.println("\n\r >> OpenDrone Flymaple 1.1 << ");
         SerialUSB.println("---------------------------------");
         SerialUSB.println("(s) Sensors Test");
         SerialUSB.println("(m) Motors Test");
@@ -132,21 +131,3 @@ void loop()
     }
 }
 
-/* Please Do Not Remove & Edit Following Code */
-#ifdef CLI
-// Force init to be called *first*, i.e. before static object allocation.
-// Otherwise, statically allocated objects that need libmaple may fail.
-__attribute__((constructor)) void premain() {
-    init();
-}
-
-int main(void) {
-    setup();
-
-    while (true) {
-        loop();
-    }
-
-    return 0;
-}
-#endif
