@@ -15,9 +15,16 @@
 #include "ADXL345.h"
 #include "ITG3205.h"
 #include "BMP085.h"
+#include "HMC5883.h"
+#include "CapturePPM.h"
 #include "motor.h"
 
 char str[512];
+
+extern volatile unsigned int chan1PPM;  //PPM捕获值寄存器
+extern volatile unsigned int chan2PPM;
+extern volatile unsigned int chan3PPM;
+extern volatile unsigned int chan4PPM;
 
 /** 
  * Sensors Test
@@ -30,45 +37,63 @@ void sensorsTest()
     int16 acc[3];
     int16 gyro[4];
     int16 i = 0, j = 0;
-    
+    int16 temperature = 0;
+    int32 pressure = 0;
+    int32 centimeters = 0;
+    float Heading;
+    int16 compass[3];
+
     SerialUSB.println("\n\rSensors Testing...");
     //Put Sensors Test Codes Here
     SerialUSB.println();
-    SerialUSB.println("(a) Accelerometer & Gyroscope Test");
-    SerialUSB.println("(p) Pressure & Temperature Test");
-    SerialUSB.println("(c) Compass Test");
 
-   puts("Sensors Test begin: \r\n\n");
-
-   while(!SerialUSB.available())
+    puts("Sensors Test begin: \r\n\n");
+    while(!SerialUSB.available())
     {
-         getAccelerometerData(acc);
-         getGyroscopeData(gyro);
+        getAccelerometerData(acc);
+        getGyroscopeData(gyro);
+        
+        temperature = bmp085GetTemperature(bmp085ReadUT());
+        pressure = bmp085GetPressure(bmp085ReadUP());
+        centimeters = bmp085GetAltitude(); //获得海拔高度，单位厘米
         
         for(i = 0; i < 3; i++)
         {
-            SerialUSB.print(acc[i]);
-            Serial2.print(acc[i]);
+            SerialUSB.print(acc[i], DEC);
+            Serial2.print(acc[i], DEC);
             SerialUSB.print("\t");
-            Serial2.print("|");
+            Serial2.print(",");
         }
-
+        
+        Heading = compassHeading();
+        SerialUSB.print(Heading, DEC);
+        SerialUSB.print("\t");
+        Serial2.print(",");
+        
         for(j = 0; j < 4; j++)
         {
-            SerialUSB.print(gyro[i]);
-            Serial2.print(gyro[i]);
-            Serial2.print("|");
+            SerialUSB.print(gyro[i], DEC);
+            Serial2.print(gyro[i], DEC);
+            Serial2.print(",");
             SerialUSB.print("\t");
         }
+        
+        SerialUSB.print(temperature, DEC);
+        SerialUSB.print("\t");
+        SerialUSB.print(pressure, DEC);
+        SerialUSB.print("\t");
+        SerialUSB.print(centimeters, DEC);
+        SerialUSB.print("\t");
 
+        SerialUSB.println();
+        Serial2.println();
+        
         delay(100);
         
-        SerialUSB.println();
-        Serial2.print(";");
     }
     
-    delay(100);
-  //延时50毫秒
+    delay(50);
+    //延时50毫秒
     return;
 }
 
@@ -81,7 +106,6 @@ void sensorsTest()
 void motorsTest()
 {
     unsigned long pMills = millis();
-    int interal = 1000;
     unsigned long curMills = 0;
 
     char tch;
@@ -139,7 +163,8 @@ void motorsTest()
         }
         SerialUSB.println(val);
     }
-        
+
+    motorStop();
     return;
 }
 
@@ -152,7 +177,24 @@ void motorsTest()
 void remoteTest()
 {
     SerialUSB.println("\n\rRemote Control Testing...");
-    //Put Remote Control code Here
+
+    while(!SerialUSB.available())
+    {
+        SerialUSB.print("PPM Channel 1: ");
+        SerialUSB.print(chan1PPM, DEC);
+        SerialUSB.print("  ");  
+        SerialUSB.print("PPM Channel 2: ");
+        SerialUSB.print(chan2PPM, DEC);
+        SerialUSB.print("  ");  
+        SerialUSB.print("PPM Channel 3: ");
+        SerialUSB.print(chan3PPM, DEC);
+        SerialUSB.print("  ");  
+        SerialUSB.print("PPM Channel 4: ");
+        SerialUSB.print(chan4PPM, DEC);
+        SerialUSB.println("  ");  
+        delay(100);
+    }
+    
     return;
 }
 
