@@ -11,3 +11,5 @@ Code Contributor: Zhuang Ming Bo, Tong Hui, Jose, XieYi. Welcome you contribute!
 
 **Note: How to develop it in UNIX toolchain? Please visit http://wiki.open-drone.org/ 
 
+not updated due to focus on the CLI method
+
