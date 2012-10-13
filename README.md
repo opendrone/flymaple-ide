@@ -1,10 +1,7 @@
-Testing IDE code
-
-  * thanks to bobo for porting freesiximu
   * Download, unzip in your sketch folder and upload. You should get Euler
 
 
-todo
+Todo
 
  * integrate PID and calibrate values
 
