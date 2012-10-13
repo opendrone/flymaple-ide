@@ -1,15 +1,21 @@
-OpenDrone - FlyMaple
-===================================
+Testing IDE code
 
-**NOTE: Please Open flymaple/flymaple.pde with Maple-IDE(Availiable Windows/Linux/Mac OS). NOT for command line use.**
+  * thanks to bobo for porting freesiximu
+  * Download, unzip in your sketch folder and upload. You should get Euler
 
-FlyMaple is another Quadcopter, based on Maple board, All Open Source.
 
-Hardware designed by Zhuang Ming Bo, via KiCAD
+todo
 
-Code Contributor: Zhuang Ming Bo, Tong Hui, Jose, XieYi. Welcome you contribute!
+ * integrate PID and calibrate values
 
-**Note: How to develop it in UNIX toolchain? Please visit http://wiki.open-drone.org/ 
 
-not updated due to focus on the CLI method
 
+Resources
+
+  * http://www.mstarlabs.com/control/znrule.html
+  * http://aeroquad.com/showthread.php?1167-Stable-Mode-Explained
+
+
+Some examples:
+
+https://github.com/mwoodward/Arduino-PID-Library/blob/master/PID_v1/Examples/PID_AdaptiveTunings/PID_AdaptiveTunings.pde
