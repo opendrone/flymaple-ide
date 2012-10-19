@@ -11,10 +11,13 @@ How to use
 ----------
 
 **Software**
+
 Get the code in a folder named `FlyMaple1_0` in your sketchs folder. The following command can help you. Execute it from your sketchbook.
+
     git clone https://github.com/opendrone/flymaple-ide.git FlyMaple1_0
 
 **Hardware**
+
 You should take care of:
 * Keeping the center of gravity centered <!-- be more precise here -->
 
@@ -22,9 +25,9 @@ Files
 -----
 
 * *FlyMaple1_0.pde* − Main file with the setup() and loop() functions
-* *AHRS.pde* − Functions to manage the [Altitude and Heading Reference System](http://en.wikipedia.org/wiki/Attitude_and_heading_reference_system)
+* *AHRS.pde* − Functions to manage the [Altitude and Heading Reference System](http://en.wikipedia.org/wiki/Attitude_and_heading_reference_system), including the PID error correction algorithm.
 * *MOTOR.pde* − 
-* *CapturePPM.pde* − 
+* *CapturePPM.pde* − Radio Frequency controller functions
 * *Communication.pde* − Utility functions to help debugging
 * *ADXL345.pde* − Librairy file for [ADXL](https://www.sparkfun.com/products/9836) 345 3-axis digital accelerometer
 * *BMP085.pde* − Librairy file for [BMP085](https://www.sparkfun.com/products/9694) barometric pressure sensor
