@@ -28,21 +28,55 @@ void initAHRS(void)
   exInt = 0.0;
   eyInt = 0.0;
   ezInt = 0.0;
+  
+  
+  // Initialize PID parameters
   twoKp = twoKpDef;
   twoKi = twoKiDef;
+  
+  
   integralFBx = 0.0f,  integralFBy = 0.0f, integralFBz = 0.0f;
+  
   lastUpdate = 0;
   now = 0;
+  
+  
   //configure I2C port 1 (pins 5, 9) with no special option flags (second argument)
   i2c_master_enable(I2C1, I2C_FAST_MODE);  //设置I2C1接口，主机模式
+  
+  
+  // Accelerometer start
+  SerialUSB.println("Initializing the Accelerometer...");
   initAcc();            //初始化加速度计
+  SerialUSB.println("Initializing the Accelerometer... Done!");
+
+
+  // Gyroscope start
+  SerialUSB.println("Initializing the Gyroscope...");
   initGyro();           //初始化陀螺仪
   delay(1000);
+  SerialUSB.println("Initializing the Gyroscope... Done!");
+  
+  SerialUSB.println("Calibrating the Gyroscope...");
   zeroCalibrateGyroscope(128,5);  //零值校正，记录陀螺仪静止状态输出的值将这个值保存到偏移量，采集128次，采样周期5ms
-  //bmp085Calibration();  //初始化气压高度计
-  //compassInit(false);   //初始化罗盘
-  //compassCalibrate(1);  //校准一次罗盘，gain为1.3Ga
-  //commpassSetMode(0);  //设置为连续测量模式 
+  SerialUSB.println("Calibrating the Gyroscope... Done!");
+
+
+  // Barometer start
+  SerialUSB.println("Calibrating the Barometer...");
+  bmp085Calibration();  //初始化气压高度计
+  SerialUSB.println("Calibrating the Barometer... Done!");
+  
+  
+  // Compass start
+  SerialUSB.println("Initializing the Compass...");
+  compassInit(false);   //初始化罗盘
+  SerialUSB.println("Initializing the Compass... Done!");
+  
+  SerialUSB.println("Calibrating the Compass...");
+  compassCalibrate(1);  //校准一次罗盘，gain为1.3Ga
+  SerialUSB.println("Calibrating the Compass... Done!");
+  commpassSetMode(0);  //设置为连续测量模式  
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -289,8 +323,6 @@ void sixDOF_Display(void)
   float angles[3]; // yaw pitch roll
   float data[6];
   delay(5);
-  initAHRS(); //begin the IMU
-  delay(5);  
   while(1)
   {
     AHRSgetEuler(angles);  
@@ -320,8 +352,6 @@ void sixDOF_Display(void)
 void AHRS_Cube(void)
 {
   float q[4]; //hold q values
-  delay(5);
-  initAHRS(); //begin the IMU
   delay(5); 
   while(1)
   {
