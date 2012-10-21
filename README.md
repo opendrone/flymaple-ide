@@ -11,15 +11,21 @@ How to use
 ----------
 
 **Software**
+Download Maple IDE:
+http://leaflabs.com/docs/maple-ide-install.html
 
-Get the code in a folder named `FlyMaple1_0` in your sketchs folder. The following command can help you. Execute it from your sketchbook.
+Get the code in your sketchs folder. The following command can help you. Execute it from your sketchbook.
 
-    git clone https://github.com/opendrone/flymaple-ide.git FlyMaple1_0
+    git clone https://github.com/opendrone/flymaple-ide.git
+
+Open FlyMaple.pde, and the other files should appear on the tabs.
 
 **Hardware**
 
 You should take care of:
 * Keeping the center of gravity centered <!-- be more precise here -->
+* We are using Flymaple board, if you want to try, you can get one here:
+http://www.dfrobot.com.cn/index.php?route=product/product&product_id=583
 
 Files
 -----
