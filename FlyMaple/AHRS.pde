@@ -83,19 +83,6 @@ void initAHRS(void)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-//函数原型:  void AHRSgetRawValues(int * raw_values)          	     
-//参数说明:  * result : AHRS原始数据指针                                      
-//返回值:    无                                                               
-//说明:      读取AHRS原始数据
-///////////////////////////////////////////////////////////////////////////////////
-void AHRSgetRawValues(int16 * raw_values)
-{
-  getAccelerometerData(&raw_values[0]);  //读取 XYZ轴加速度原始数据
-  getGyroscopeRaw(&raw_values[3]);    //读取 XYZ轴及其温度，陀螺仪原始数据
-  //magn.getValues(&raw_values[6], &raw_values[7], &raw_values[8]); //读取罗盘原始数据
-}
-
-////////////////////////////////////////////////////////////////////////////////////
 //函数原型:  void AHRSgetValues(float * values)      	     
 //参数说明:  * values : AHRS数据指针                                      
 //返回值:    无                                                               
