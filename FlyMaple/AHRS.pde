@@ -81,7 +81,7 @@ void initAHRS(void)
 
 ////////////////////////////////////////////////////////////////////////////////////
 //函数原型:  void AHRSgetRawValues(int * raw_values)          	     
-//参数说明:  * result : AHRS原始数据指针                                      
+//参数说明:  * result : AHRS原始数据指针      This function just gets raw values, and do nothing?                                  
 //返回值:    无                                                               
 //说明:      读取AHRS原始数据
 ///////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ void AHRSgetRawValues(int16 * raw_values)
 {
   getAccelerometerData(&raw_values[0]);  //读取 XYZ轴加速度原始数据
   getGyroscopeRaw(&raw_values[3]);    //读取 XYZ轴及其温度，陀螺仪原始数据
-  //magn.getValues(&raw_values[6], &raw_values[7], &raw_values[8]); //读取罗盘原始数据
+  compassRead(&raw_values[6]); //读取罗盘原始数据
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -101,11 +101,19 @@ void AHRSgetRawValues(int16 * raw_values)
 void AHRSgetValues(float * values) 
 {  
   int16 val[4];
+  int16 compassVal[4];
+  
   getAccelerometerData(&val[0]);  //读取 XYZ轴加速度原始数据，然后转换成浮点数
   values[0] = ((float) val[0]);
   values[1] = ((float) val[1]);
   values[2] = ((float) val[2]);
+  
   getGyroscopeData(&values[3]); //读取 XYZ轴陀螺仪 角速度
+  
+  compassRead(&compassVal[0]);
+  values[6] = ((float) compassVal[0]);
+  values[7] = ((float) compassVal[1]);
+  values[8] = ((float) compassVal[2]);
 }
 
 //http://blog.csdn.net/zhengjiaxiang135/article/details/6673639
@@ -146,7 +154,7 @@ void AHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, floa
   q2q3 = q2 * q3;
   q3q3 = q3 * q3;
 
-  /*
+  
   // Use magnetometer measurement only when valid (avoids NaN in magnetometer normalisation)
    if((mx != 0.0f) && (my != 0.0f) && (mz != 0.0f)) {
    float hx, hy, bx, bz;
@@ -174,7 +182,7 @@ void AHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, floa
    halfey = (mz * halfwx - mx * halfwz);
    halfez = (mx * halfwy - my * halfwx);
    }
-   */
+   
 
   // Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)
   if((ax != 0.0f) && (ay != 0.0f) && (az != 0.0f)) 
@@ -269,7 +277,7 @@ void AHRSgetQ(float * q)
   // gyro values are expressed in deg/sec, the * M_PI/180 will convert it to radians/sec
   //AHRSupdate(val[3] * M_PI/180, val[4] * M_PI/180, val[5] * M_PI/180, val[0], val[1], val[2], val[6], val[7], val[8]);
   // use the call below when using a 6DOF IMU
-  AHRSupdate(val[3] * M_PI/180, val[4] * M_PI/180, val[5] * M_PI/180, val[0], val[1], val[2], 0, 0, 0);
+  AHRSupdate(val[3] * M_PI/180, val[4] * M_PI/180, val[5] * M_PI/180, val[0], val[1], val[2], val[6], val[7], val[8]);
   q[0] = q0;
   q[1] = q1;
   q[2] = q2;
@@ -331,20 +339,26 @@ void sixDOF_Display(void)
     SerialUSB.print(angles[1]);
     SerialUSB.print(" | ");
     SerialUSB.println(angles[2]);  
-    /*
-	AHRSgetValues(data);
-	SerialUSB.print(data[0]);
-	SerialUSB.print(" | ");  
-	SerialUSB.print(data[1]);
-	SerialUSB.print(" | ");  
-	SerialUSB.print(data[2]);
-	SerialUSB.print(" | ");  
-	SerialUSB.print(data[3]);
-	SerialUSB.print(" | ");  
-	SerialUSB.print(data[4]);
-	SerialUSB.print(" | ");  
-	SerialUSB.println(data[5]);
-	*/  
+    
+//	AHRSgetValues(data);
+//	SerialUSB.print(data[0]);
+//	SerialUSB.print(" | ");  
+//	SerialUSB.print(data[1]);
+//	SerialUSB.print(" | ");  
+//	SerialUSB.print(data[2]);
+//	SerialUSB.print(" | ");  
+//	SerialUSB.print(data[3]);
+//	SerialUSB.print(" | ");  
+//	SerialUSB.print(data[4]);
+//	SerialUSB.print(" | ");  
+//	SerialUSB.print(data[5]);
+//	SerialUSB.print(" | ");  
+//	SerialUSB.print(data[6]);
+//	SerialUSB.print(" | ");  
+//	SerialUSB.print(data[7]);
+//	SerialUSB.print(" | ");  
+//	SerialUSB.println(data[8]);
+	
 	delay(100);   
   }
 }

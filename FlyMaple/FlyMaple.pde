@@ -40,7 +40,7 @@ void loop()
   //AHRS_Cube();
 
   // Uncomment the following line to display the values of Euler angles measured by the FlyMaple board
-  //sixDOF_Display();
+  sixDOF_Display();
 
   // Uncomment the following line to display the values of RF controller input
   //capturePPMTest();
@@ -55,7 +55,7 @@ void loop()
   //GyroscopeTest();
 
   // Uncomment the following to test the compass (not working for me yet)
-  compassTest();
+  //compassTest();
     
   delay(100); // to avoid crashing the IDE serial
 }
