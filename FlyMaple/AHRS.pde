@@ -1,5 +1,5 @@
 
-#define twoKpDef  (2.0f * 10.0f) // 2 * proportional gain 两倍比例增益
+#define twoKpDef  (2.0f * 0.1f) // 2 * proportional gain 两倍比例增益
 #define twoKiDef  (2.0f * 0.1f) // 2 * integral gain    两倍积分增益
 
 float iq0, iq1, iq2, iq3;    //计算变量
