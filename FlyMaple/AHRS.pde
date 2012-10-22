@@ -1,5 +1,5 @@
 
-#define twoKpDef  (2.0f * 0.5f) // 2 * proportional gain 两倍比例增益
+#define twoKpDef  (2.0f * 10.0f) // 2 * proportional gain 两倍比例增益
 #define twoKiDef  (2.0f * 0.1f) // 2 * integral gain    两倍积分增益
 
 float iq0, iq1, iq2, iq3;    //计算变量
@@ -368,13 +368,13 @@ void AHRSgetYawPitchRoll(float * ypr)
   ypr[2] = atan(gy / sqrt(gx*gx + gz*gz))  * 180/M_PI;
 }
 
-void sixDOF_Display(void)
+void YPR_Display(void)
 {
   float angles[3];
   delay(5);
   while(1)
   {
-    AHRSgetAngles(angles);  
+    AHRSgetYawPitchRoll(angles);  
     SerialUSB.print(angles[0]);
     SerialUSB.print(" | ");  
     SerialUSB.print(angles[1]);

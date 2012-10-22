@@ -13,49 +13,55 @@ extern volatile unsigned int chan2PPM;
 extern volatile unsigned int chan3PPM;
 extern volatile unsigned int chan4PPM;
 
+
+char str[512]; 
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//函数原型:  void setup()               	     
+//参数说明:  无                                        
+//返回值:    无                                                               
+//说明:      FlyMaple板 初始化函数
+///////////////////////////////////////////////////////////////////////////////////
 void setup()
 {
   SerialUSB.begin();
   
   // Initialize the AHRS
   SerialUSB.println("AHRS Initialization...");
-  delay(10);
   initAHRS();
- 
-  
-  // Some more required inits
-//  motorInit();       //电机控制初始化 
-//  capturePPMInit();  //捕获遥控器接收机PPM输入信号功能初始化   
-  
-  //some delay to let the sensors startup
-  delay(200);
   SerialUSB.println("AHRS Initialization... Done!");
 }
 
 
+////////////////////////////////////////////////////////////////////////////////////
+//函数原型:  void loop()            	     
+//参数说明:  无                                        
+//返回值:    无                                                               
+//说明:      主函数，程序主循环
+///////////////////////////////////////////////////////////////////////////////////
 void loop()
 {
 
   // The following method is used to get 3D position for another piece of software. Ask Jose for more information.
   //AHRS_Cube();
 
-  // Uncomment the following line to display the values of Euler angles measured by the FlyMaple board
-  sixDOF_Display();
+  // Uncomment the following line to display Yaw, Pitch & Roll angles measured by the FlyMaple board
+  YPR_Display();
 
   // Uncomment the following line to display the values of RF controller input
   //capturePPMTest();
 
-  // Uncomment the following to test the barometer (temperature, pressure, altitude)
+  // Uncomment the following to test the barometer (temperature, pressure, altitude). Seems to work
   //bmp085Test();
 
-  // Uncomment the following to test the accelerometer
+  // Uncomment the following to test the accelerometer. Works fine.
   //accelerometerTest();
 
-  // Uncomment the following to test the gyroscope
+  // Uncomment the following to test the gyroscope. Works fine.
   //GyroscopeTest();
 
-  // Uncomment the following to test the compass (not working for me yet)
+  // Uncomment the following to test the compass. Seems to work.
   //compassTest();
-    
-  delay(100); // to avoid crashing the IDE serial
+
 }
