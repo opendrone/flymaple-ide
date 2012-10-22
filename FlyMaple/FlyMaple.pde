@@ -13,33 +13,35 @@ extern volatile unsigned int chan2PPM;
 extern volatile unsigned int chan3PPM;
 extern volatile unsigned int chan4PPM;
 
-
-char str[512]; 
-
-
-////////////////////////////////////////////////////////////////////////////////////
-//函数原型:  void setup()               	     
-//参数说明:  无                                        
-//返回值:    无                                                               
-//说明:      FlyMaple板 初始化函数
-///////////////////////////////////////////////////////////////////////////////////
 void setup()
 {
   SerialUSB.begin();
   
   // Initialize the AHRS
   SerialUSB.println("AHRS Initialization...");
+  delay(10);
   initAHRS();
+  delay(10);
+  
+  //configure I2C port 1 (pins 5, 9) with no special option flags (second argument)
+//  i2c_master_enable(I2C1, 0);
+  
+  // Some more required inits
+//  motorInit();       //电机控制初始化 
+//  capturePPMInit();  //捕获遥控器接收机PPM输入信号功能初始化   
+//  initAcc();            //初始化加速度计
+//  initGyro();           //初始化陀螺仪
+//  bmp085Calibration();  //初始化气压高度计
+//  compassInit(false);   //初始化罗盘
+//  compassCalibrate(1);  //校准一次罗盘，gain为1.3Ga
+//  commpassSetMode(0);  //设置为连续测量模式 
+  
+  //some delay to let the sensors startup
+  delay(200);
   SerialUSB.println("AHRS Initialization... Done!");
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////
-//函数原型:  void loop()            	     
-//参数说明:  无                                        
-//返回值:    无                                                               
-//说明:      主函数，程序主循环
-///////////////////////////////////////////////////////////////////////////////////
 void loop()
 {
 
@@ -47,7 +49,7 @@ void loop()
   //AHRS_Cube();
 
   // Uncomment the following line to display the values of Euler angles measured by the FlyMaple board
-  sixDOF_Display();
+  //sixDOF_Display();
 
   // Uncomment the following line to display the values of RF controller input
   //capturePPMTest();
@@ -62,6 +64,7 @@ void loop()
   //GyroscopeTest();
 
   // Uncomment the following to test the compass (not working for me yet)
-  //compassTest();
-
+  compassTest();
+    
+  delay(100); // to avoid crashing the IDE serial
 }
