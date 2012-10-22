@@ -317,7 +317,9 @@ void AHRSgetQ(float * q)
   sampleFreq = 1.0 / ((now - lastUpdate) / 1000000.0);
   lastUpdate = now;
   // 9DOF IMU
-  AHRSupdate(val[0] * M_PI/180, val[1] * M_PI/180, val[2] * M_PI/180, val[3], val[4], val[5], val[6], val[7], val[8]);
+  //AHRSupdate(val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7], val[8]);
+  // 6DOF IMU
+  AHRSupdate(val[0], val[1], val[2], val[3], val[4], val[5], 0.0f, 0.0f, 0.0f);
   q[0] = q0;
   q[1] = q1;
   q[2] = q2;
@@ -368,12 +370,11 @@ void AHRSgetYawPitchRoll(float * ypr)
 
 void sixDOF_Display(void)
 {
-  float angles[3]; // yaw pitch roll
-  float data[6];
+  float angles[3];
   delay(5);
   while(1)
   {
-    AHRSgetEuler(angles);  
+    AHRSgetAngles(angles);  
     SerialUSB.print(angles[0]);
     SerialUSB.print(" | ");  
     SerialUSB.print(angles[1]);
