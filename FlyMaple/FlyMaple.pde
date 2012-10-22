@@ -21,20 +21,11 @@ void setup()
   SerialUSB.println("AHRS Initialization...");
   delay(10);
   initAHRS();
-  delay(10);
-  
-  //configure I2C port 1 (pins 5, 9) with no special option flags (second argument)
-//  i2c_master_enable(I2C1, 0);
+ 
   
   // Some more required inits
 //  motorInit();       //电机控制初始化 
 //  capturePPMInit();  //捕获遥控器接收机PPM输入信号功能初始化   
-//  initAcc();            //初始化加速度计
-//  initGyro();           //初始化陀螺仪
-//  bmp085Calibration();  //初始化气压高度计
-//  compassInit(false);   //初始化罗盘
-//  compassCalibrate(1);  //校准一次罗盘，gain为1.3Ga
-//  commpassSetMode(0);  //设置为连续测量模式 
   
   //some delay to let the sensors startup
   delay(200);

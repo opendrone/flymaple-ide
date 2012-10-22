@@ -161,13 +161,13 @@ double compassHeading(void)
 
 void compassTest(void)//HMC5883罗盘测试
 {
-  //compassInit(false);   //initialized on setup loop
+  //initialized compass on setup loop
   float Heading;
   Heading = compassHeading();  // reads the compass everytime the function is called.
   SerialUSB.print("commpass: ");
   SerialUSB.print(Heading, DEC);
   SerialUSB.println(" degree");
-  delay(100);
+  //delay(100);  // delayed on loop
 
 }
 
