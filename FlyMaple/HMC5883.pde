@@ -31,13 +31,13 @@ void compassInit(uint8 setmode)
   delay(5);
   if (setmode)
   {
-    commpassSetMode(0);
+    compassSetMode(0);
   }
-  writeTo(HMC5883_ADDR, HMC5883_R_CONFA, 0x70); //8-average, 15 Hz default, normal measurement 每次输出采样8次，15HZ输出采样率，普通模式
+ // writeTo(HMC5883_ADDR, HMC5883_R_CONFA, 0x70); //8-average, 15 Hz default, normal measurement 每次输出采样8次，15HZ输出采样率，普通模式
   //writeTo(HMC5883_ADDR, HMC5883_R_CONFB, 0xa0); // Gain=5, or any other desired gain 
   writeTo(HMC5883_ADDR, HMC5883_R_MODE, 0x00); // Set continouos mode (default to 10Hz)
 }
-void commpassSetMode(uint8 mode) 
+void compassSetMode(uint8 mode) 
 { 
   if (mode > 2) 
   {
@@ -59,34 +59,34 @@ void compassCalibrate(uint8 gain)
   writeTo(HMC5883_ADDR, HMC5883_R_CONFA, 0x10 + HMC_POS_BIAS); // Reg A DOR=0x010 + MS1,MS0 set to pos bias
   compassSetGain(gain);
   float x, y, z, mx=0, my=0, mz=0;
-
+  
   for (uint8 i=0; i<10; i++) 
   { 
-    commpassSetMode(1);
+    compassSetMode(1);
     compassRead(compassdata); 
-
+  
     fx = ((float) compassdata[0]) / x_scale;
     fy = ((float) compassdata[1]) / y_scale;  
     fz = ((float) compassdata[2]) / z_scale;  
     x= (int16) (fx + 0.5);
     y= (int16) (fy + 0.5);
     z= (int16) (fz + 0.5);
-
+  
     if (x>mx) mx = x;
     if (y>my) my = y;
     if (z>mz) mz = z;
   }
-
-  float max = 0;
-  if (mx>max) max = mx;
-  if (my>max) max = my;
-  if (mz>max) max = mz;
+  
+  float maxi = 0;
+  if (mx>maxi) maxi = mx;
+  if (my>maxi) maxi = my;
+  if (mz>maxi) maxi = mz;
   x_max = mx;
   y_max = my;
   z_max = mz;
-  x_scale = max/mx; // calc scales
-  y_scale = max/my;
-  z_scale = max/mz;
+  x_scale = maxi/mx; // calc scales
+  y_scale = maxi/my;
+  z_scale = maxi/mz;
   writeTo(HMC5883_ADDR, HMC5883_R_CONFA, 0x010); // set RegA/DOR back to default
 }
 
@@ -112,11 +112,11 @@ void compassRead(int16 * result)
 {
   uint8 buff[6];
   readFrom(HMC5883_ADDR, HMC5883_R_XM, 6, buff);
-  // MSB byte first, then LSB, X,Y,Z
+   // MSB byte first, then LSB, X,Y,Z
   result[0] = (((int16)buff[0]) << 8) | buff[1];    // X axis 
   result[1] = (((int16)buff[4]) << 8) | buff[5];    // Y axis 
   result[2] = (((int16)buff[2]) << 8) | buff[3];    // Z axis
-}
+ }
 
 double compassHeading(void)
 {
@@ -130,44 +130,48 @@ double compassHeading(void)
   fx = ((float) compassdata[0]) / x_scale;
   fy = ((float) compassdata[1]) / y_scale;
   heading = atan2(fy, fx);
-
+  
   // Correct for when signs are reversed.
   if(heading < 0)    heading += 2*PI;
 
   return(heading * 180/PI); 
 
-
-
-  /*使用俯仰角进行补偿的计算方式详见 SF9DOF代码
-   float MAG_X;
-   float MAG_Y;
-   float cos_roll;
-   float sin_roll;
-   float cos_pitch;
-   float sin_pitch;
-   
-   cos_roll = cos(roll);
-   sin_roll = sin(roll);
-   cos_pitch = cos(pitch);
-   sin_pitch = sin(pitch);
-   // Tilt compensated Magnetic filed X:
-   MAG_X = magnetom_x*cos_pitch+magnetom_y*sin_roll*sin_pitch+magnetom_z*cos_roll*sin_pitch;
-   // Tilt compensated Magnetic filed Y:
-   MAG_Y = magnetom_y*cos_roll-magnetom_z*sin_roll;
-   // Magnetic Heading
-   MAG_Heading = atan2(-MAG_Y,MAG_X);
-   */
+  
+  
+     /*使用俯仰角进行补偿的计算方式详见 SF9DOF代码
+  float MAG_X;
+  float MAG_Y;
+  float cos_roll;
+  float sin_roll;
+  float cos_pitch;
+  float sin_pitch;
+  
+  cos_roll = cos(roll);
+  sin_roll = sin(roll);
+  cos_pitch = cos(pitch);
+  sin_pitch = sin(pitch);
+  // Tilt compensated Magnetic filed X:
+  MAG_X = magnetom_x*cos_pitch+magnetom_y*sin_roll*sin_pitch+magnetom_z*cos_roll*sin_pitch;
+  // Tilt compensated Magnetic filed Y:
+  MAG_Y = magnetom_y*cos_roll-magnetom_z*sin_roll;
+  // Magnetic Heading
+  MAG_Heading = atan2(-MAG_Y,MAG_X);
+ */
 }
 
 void compassTest(void)//HMC5883罗盘测试
 {
-  //initialized compass on setup loop
-  float Heading;
-  Heading = compassHeading();  // reads the compass everytime the function is called.
-  SerialUSB.print("commpass: ");
-  SerialUSB.print(Heading, DEC);
-  SerialUSB.println(" degree");
-  //delay(100);  // delayed on loop
-
+  while(1)
+  {
+    int16 res[3]; 
+    compassRead(res); 
+    //Print out values of each axis
+    SerialUSB.print("x: ");
+    SerialUSB.print(res[0]);
+    SerialUSB.print("  y: ");
+    SerialUSB.print(res[1]);
+    SerialUSB.print("  z: ");
+    SerialUSB.println(res[2]);
+    delay(100);
+  }  
 }
-
