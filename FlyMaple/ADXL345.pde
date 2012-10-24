@@ -22,9 +22,7 @@
 #define ADXLREG_DATAZ1       0x37
 
 // 加速度传感器误差修正的偏移量
-int16 a_offx = 0;
-int16 a_offy = 0;
-int16 a_offz = 0;
+int16 a_offset[3];
 ////////////////////////////////////////////////////////////////////////////////////
 //函数原型:  void initAcc(void)             	     
 //参数说明:  无                                        
@@ -59,16 +57,31 @@ void initAcc(void)
     SerialUSB.println("Halting program, hit reset...");
     waitForButtonPress(0);
   }
-
-  //调用 ADXL345
-  writeTo(ACC, ADXLREG_POWER_CTL, 0x08); //仅开启工作模式 
-  delay(5);
-//  writeTo(ACC, ADXLREG_DATA_FORMAT, 0x08); //
-//  delay(5);
-//  writeTo(ACC, ADXLREG_BW_RATE, 0x09);//
-//  delay(5);
-//  //设定在 +-2g 时的默认读数
+    //调用 ADXL345
+    //writeTo(ACC, ADXLREG_POWER_CTL, 0x00); //清零 
+    writeTo(ACC,ADXLREG_DATA_FORMAT,0x08); //Set accelerometer to +/-2g
+  writeTo(ACC,ADXLREG_POWER_CTL,0x08); //Set accelerometer to measure mode
+//    writeTo(ACC, ADXLREG_POWER_CTL, 0xff);//休眠
+//    writeTo(ACC, ADXLREG_POWER_CTL, 0x08); //仅开启工作模式
+    //设定在 +-2g 时的默认读数
+    float accumulator[] = {0,0,0};
+    for(int i = 0 ; i < 100 ; i++) {
+	    short acc[3];
+	    getAccelerometerData(acc);
+SerialUSB.print("adding to accumulator ");
+SerialUSB.println(acc[1]);
+	    accumulator[0] += acc[0];
+	    accumulator[1] += acc[1];
+	    accumulator[2] += acc[2];
+    delay(10)  ;
+    }
+SerialUSB.print("total value is ");
+SerialUSB.println(accumulator[1] / 100);
+    for(int i = 0 ; i < 3 ; i++) accumulator[i] /= 100;
+    accumulator[2] -= 500; // 1g at 2mg/LSB more or less.
+    for(int i = 0 ; i < 3 ; i++) a_offset[i] = accumulator[i];
 }
+
 ////////////////////////////////////////////////////////////////////////////////////
 //函数原型:  void getAccelerometerData(int16 * result)            	     
 //参数说明:  * result: 读取加速值指针                                        
@@ -84,14 +97,13 @@ void getAccelerometerData(int16 * result)
 
   //每个轴的读数有10位分辨率，即2个字节.  
   //我们要转换两个bytes为一个int变量
-  result[0] = (((int16)buff[1]) << 8) | buff[0] + a_offx;   
-  result[1] = (((int16)buff[3]) << 8) | buff[2] + a_offy;
-  result[2] = (((int16)buff[5]) << 8) | buff[4] + a_offz;
+  result[0] = (((int16)buff[1]) << 8) | buff[0] - a_offset[0];   
+  result[1] = (((int16)buff[3]) << 8) | buff[2] - a_offset[1];
+  result[2] = (((int16)buff[5]) << 8) | buff[4] - a_offset[2];
 }
 void accelerometerTest(void)//ADXL345加速度读取测试例子
 {
   int16 acc[3];
-  initAcc();            //初始化加速度计
   while(1)
   {
     getAccelerometerData(acc);  //读取加速度
