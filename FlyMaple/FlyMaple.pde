@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "wirish.h"
 #include "i2c.h"
+#include "kalman.h"
 
 // This holds the output values that are supposed to be sent to the motors.
 // The values can then be sent by using the motorControl() method. See MOTOR.pde for more information.

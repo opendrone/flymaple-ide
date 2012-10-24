@@ -88,6 +88,20 @@ void initAHRS(void)
 //返回值:    无                                                               
 //说明:      读取AHRS数据
 ///////////////////////////////////////////////////////////////////////////////////
+
+// Kalman thanks to http://interactive-matter.eu/blog/2009/12/18/filtering-sensor-data-with-a-kalman-filter/
+double kalman_q = 1;
+double kalman_r = 32;
+double kalman_p = 0;
+kalman_state kalman_a_x = kalman_init(kalman_q,kalman_r,kalman_p,0);
+kalman_state kalman_a_y = kalman_init(kalman_q,kalman_r,kalman_p,0);
+kalman_state kalman_a_z = kalman_init(kalman_q,kalman_r,kalman_p,0);
+kalman_state kalman_g_x = kalman_init(kalman_q,kalman_r,kalman_p,0);
+kalman_state kalman_g_y = kalman_init(kalman_q,kalman_r,kalman_p,0);
+kalman_state kalman_g_z = kalman_init(kalman_q,kalman_r,kalman_p,0);
+kalman_state kalman_m_x = kalman_init(kalman_q,kalman_r,kalman_p,0);
+kalman_state kalman_m_y = kalman_init(kalman_q,kalman_r,kalman_p,0);
+kalman_state kalman_m_z = kalman_init(kalman_q,kalman_r,kalman_p,0);
 void AHRSgetValues(float * values) 
 {  
   float valG[3];
@@ -107,6 +121,35 @@ void AHRSgetValues(float * values)
   values[7] = ((float) valC[1]);
   values[8] = ((float) valC[2]);
 }
+
+// apply a kalman filter to values
+void AHRSgetFilteredValues(float * values)
+{
+  float unfiltered[9];
+  AHRSgetValues(unfiltered);
+  
+  kalman_update(&kalman_g_x,unfiltered[0]);
+  kalman_update(&kalman_g_y,unfiltered[1]);
+  kalman_update(&kalman_g_z,unfiltered[2]);
+  kalman_update(&kalman_a_x,unfiltered[3]);
+  kalman_update(&kalman_a_y,unfiltered[4]);
+  kalman_update(&kalman_a_z,unfiltered[5]);
+  kalman_update(&kalman_m_x,unfiltered[6]);
+  kalman_update(&kalman_m_y,unfiltered[7]);
+  kalman_update(&kalman_m_z,unfiltered[8]);
+  
+  values[0] = kalman_g_x.x;
+  values[1] = kalman_g_y.x;
+  values[2] = kalman_g_z.x;
+  values[3] = kalman_a_x.x;
+  values[4] = kalman_a_y.x;
+  values[5] = kalman_a_z.x;
+  values[6] = kalman_m_x.x;
+  values[7] = kalman_m_y.x;
+  values[8] = kalman_m_z.x;
+  
+}
+
 
 // Fast inverse square-root
 // See: http://en.wikipedia.org/wiki/Fast_inverse_square_root
@@ -300,7 +343,7 @@ void AHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, floa
 void AHRSgetQ(float * q) 
 {
   float val[9];
-  AHRSgetValues(val);
+  AHRSgetFilteredValues(val);
 
   now = micros();
   sampleFreq = 1.0 / ((now - lastUpdate) / 1000000.0);
