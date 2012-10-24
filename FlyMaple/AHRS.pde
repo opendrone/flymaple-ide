@@ -51,6 +51,7 @@ void initAHRS(void)
   // Accelerometer start
   SerialUSB.println("Initializing the Accelerometer...");
   initAcc();            //初始化加速度计
+  delay(1000);
   SerialUSB.println("Initializing the Accelerometer... Done!");
 
 
@@ -416,13 +417,13 @@ void YPR_Display(void)
   }
 }
 
-void YPR_Display_Raw(void)
+void Display_Raw(void)
 {
   float data[6];
   delay(5);
   while(1)
   {  
-    AHRSgetValues(data);
+    AHRSgetFilteredValues(data);
     SerialUSB.print(data[0]);
     SerialUSB.print(" | ");  
     SerialUSB.print(data[1]);

@@ -43,13 +43,14 @@ void setup()
 ///////////////////////////////////////////////////////////////////////////////////
 void loop()
 {
+  // Uncomment the following to get all measured values after correction & filtering.
+  //Display_Raw();
 
   // The following method is used to get 3D position for processing. Ask Jose for more information.
   //AHRS_Cube();
 
   // Uncomment the following line to display Yaw, Pitch & Roll angles measured by the FlyMaple board
-  //YPR_Display_Raw();  //uncomment to display raw values
-  YPR_Display();
+  //YPR_Display();
 
   // Uncomment the following line to display the values of RF controller input
   //capturePPMTest();
