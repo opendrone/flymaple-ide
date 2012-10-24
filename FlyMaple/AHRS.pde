@@ -20,7 +20,7 @@ int16 startLoopTime;
 ///////////////////////////////////////////////////////////////////////////////////
 void initAHRS(void)
 {
-  
+
   // 初始化四元数 initialize quaternion
   q0 = 1.0f;
   q1 = 0.0f;
@@ -29,25 +29,25 @@ void initAHRS(void)
   exInt = 0.0;
   eyInt = 0.0;
   ezInt = 0.0;
-  
-  
+
+
   // Initialize PID parameters
   twoKp = twoKpDef;
   twoKi = twoKiDef;
-  
-  
+
+
   integralFBx = 0.0f;
   integralFBy = 0.0f;
   integralFBz = 0.0f;
-  
+
   lastUpdate = 0;
   now = 0;
-  
-  
+
+
   //configure I2C port 1 (pins 5, 9) with no special option flags (second argument)
   i2c_master_enable(I2C1, I2C_FAST_MODE);  //设置I2C1接口，主机模式
-  
-  
+
+
   // Accelerometer start
   SerialUSB.println("Initializing the Accelerometer...");
   initAcc();            //初始化加速度计
@@ -59,7 +59,7 @@ void initAHRS(void)
   initGyro();           //初始化陀螺仪
   delay(1000);
   SerialUSB.println("Initializing the Gyroscope... Done!");
-  
+
   SerialUSB.println("Calibrating the Gyroscope...");
   zeroCalibrateGyroscope(128,5);  //零值校正，记录陀螺仪静止状态输出的值将这个值保存到偏移量，采集128次，采样周期5ms
   SerialUSB.println("Calibrating the Gyroscope... Done!");
@@ -69,13 +69,13 @@ void initAHRS(void)
   SerialUSB.println("Calibrating the Barometer...");
   bmp085Calibration();  //初始化气压高度计
   SerialUSB.println("Calibrating the Barometer... Done!");
-  
-  
+
+
   // Compass start
   SerialUSB.println("Initializing the Compass...");
   compassInit(false);   //初始化罗盘
   SerialUSB.println("Initializing the Compass... Done!");
-  
+
   SerialUSB.println("Calibrating the Compass...");
   compassCalibrate(1);  //校准一次罗盘，gain为1.3Ga
   SerialUSB.println("Calibrating the Compass... Done!");
@@ -111,13 +111,13 @@ void AHRSgetValues(float * values)
 // Fast inverse square-root
 // See: http://en.wikipedia.org/wiki/Fast_inverse_square_root
 float invSqrt(float x) {
-	float halfx = 0.5f * x;
-	float y = x;
-	long i = *(long*)&y;
-	i = 0x5f3759df - (i>>1);
-	y = *(float*)&i;
-	y = y * (1.5f - (halfx * y * y));
-	return y;
+  float halfx = 0.5f * x;
+  float y = x;
+  long i = *(long*)&y;
+  i = 0x5f3759df - (i>>1);
+  y = *(float*)&i;
+  y = y * (1.5f - (halfx * y * y));
+  return y;
 }
 
 // Quaternion implementation of the 'DCM filter' [Mayhony et al].  Incorporates the magnetic distortion
@@ -133,26 +133,26 @@ void AHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az) {
   float halfvx, halfvy, halfvz;
   float halfex, halfey, halfez;
   float qa, qb, qc;
-  
+
   // Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)
   if(!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
-  
+
     // Normalise accelerometer measurement
     recipNorm = invSqrt(ax * ax + ay * ay + az * az);
     ax *= recipNorm;
     ay *= recipNorm;
     az *= recipNorm;        
-    
+
     // Estimated direction of gravity and vector perpendicular to magnetic flux
     halfvx = q1 * q3 - q0 * q2;
     halfvy = q0 * q1 + q2 * q3;
     halfvz = q0 * q0 - 0.5f + q3 * q3;
-    	
+
     // Error is sum of cross product between estimated and measured direction of gravity
     halfex = (ay * halfvz - az * halfvy);
     halfey = (az * halfvx - ax * halfvz);
     halfez = (ax * halfvy - ay * halfvx);
-    
+
     // Compute and apply integral feedback if enabled
     if(twoKi > 0.0f) {
       integralFBx += twoKi * halfex * (1.0f / sampleFreq);	// integral error scaled by Ki
@@ -161,18 +161,19 @@ void AHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az) {
       gx += integralFBx;	// apply integral feedback
       gy += integralFBy;
       gz += integralFBz;
-    } else {
+    } 
+    else {
       integralFBx = 0.0f;	// prevent integral windup
       integralFBy = 0.0f;
       integralFBz = 0.0f;
     }
-    
+
     // Apply proportional feedback
     gx += twoKp * halfex;
     gy += twoKp * halfey;
     gz += twoKp * halfez;
   }
-  	
+
   // Integrate rate of change of quaternion
   gx *= (0.5f * (1.0f / sampleFreq));		// pre-multiply common factors
   gy *= (0.5f * (1.0f / sampleFreq));
@@ -184,7 +185,7 @@ void AHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az) {
   q1 += (qa * gx + qc * gz - q3 * gy);
   q2 += (qa * gy - qb * gz + q3 * gx);
   q3 += (qa * gz + qb * gy - qc * gx); 
-  	
+
   // Normalise quaternion
   recipNorm = invSqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
   q0 *= recipNorm;
@@ -201,28 +202,28 @@ void AHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, floa
   float halfvx, halfvy, halfvz, halfwx, halfwy, halfwz;
   float halfex, halfey, halfez;
   float qa, qb, qc;
-  
+
   // Use IMU algorithm if magnetometer measurement invalid (avoids NaN in magnetometer normalisation)
   if((mx == 0.0f) && (my == 0.0f) && (mz == 0.0f)) {
     AHRSupdateIMU(gx, gy, gz, ax, ay, az);
     return;
   }
-  
+
   // Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)
   if(!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
-  
+
     // Normalise accelerometer measurement
     recipNorm = invSqrt(ax * ax + ay * ay + az * az);
     ax *= recipNorm;
     ay *= recipNorm;
     az *= recipNorm;     
-    
+
     // Normalise magnetometer measurement
     recipNorm = invSqrt(mx * mx + my * my + mz * mz);
     mx *= recipNorm;
     my *= recipNorm;
     mz *= recipNorm;   
-  
+
     // Auxiliary variables to avoid repeated arithmetic
     q0q0 = q0 * q0;
     q0q1 = q0 * q1;
@@ -234,13 +235,13 @@ void AHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, floa
     q2q2 = q2 * q2;
     q2q3 = q2 * q3;
     q3q3 = q3 * q3;   
-  
+
     // Reference direction of Earth's magnetic field
     hx = 2.0f * (mx * (0.5f - q2q2 - q3q3) + my * (q1q2 - q0q3) + mz * (q1q3 + q0q2));
     hy = 2.0f * (mx * (q1q2 + q0q3) + my * (0.5f - q1q1 - q3q3) + mz * (q2q3 - q0q1));
     bx = sqrt(hx * hx + hy * hy);
     bz = 2.0f * (mx * (q1q3 - q0q2) + my * (q2q3 + q0q1) + mz * (0.5f - q1q1 - q2q2));
-  
+
     // Estimated direction of gravity and magnetic field
     halfvx = q1q3 - q0q2;
     halfvy = q0q1 + q2q3;
@@ -248,12 +249,12 @@ void AHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, floa
     halfwx = bx * (0.5f - q2q2 - q3q3) + bz * (q1q3 - q0q2);
     halfwy = bx * (q1q2 - q0q3) + bz * (q0q1 + q2q3);
     halfwz = bx * (q0q2 + q1q3) + bz * (0.5f - q1q1 - q2q2);  
-    	
+
     // Error is sum of cross product between estimated direction and measured direction of field vectors
     halfex = (ay * halfvz - az * halfvy) + (my * halfwz - mz * halfwy);
     halfey = (az * halfvx - ax * halfvz) + (mz * halfwx - mx * halfwz);
     halfez = (ax * halfvy - ay * halfvx) + (mx * halfwy - my * halfwx);
-    
+
     // Compute and apply integral feedback if enabled
     if(twoKi > 0.0f) {
       integralFBx += twoKi * halfex * (1.0f / sampleFreq);	// integral error scaled by Ki
@@ -262,18 +263,19 @@ void AHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, floa
       gx += integralFBx;	// apply integral feedback
       gy += integralFBy;
       gz += integralFBz;
-    } else {
+    } 
+    else {
       integralFBx = 0.0f;	// prevent integral windup
       integralFBy = 0.0f;
       integralFBz = 0.0f;
     }
-    
+
     // Apply proportional feedback
     gx += twoKp * halfex;
     gy += twoKp * halfey;
     gz += twoKp * halfez;
   }
-  	
+
   // Integrate rate of change of quaternion
   gx *= (0.5f * (1.0f / sampleFreq));		// pre-multiply common factors
   gy *= (0.5f * (1.0f / sampleFreq));
@@ -285,7 +287,7 @@ void AHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, floa
   q1 += (qa * gx + qc * gz - q3 * gy);
   q2 += (qa * gy - qb * gz + q3 * gx);
   q3 += (qa * gz + qb * gy - qc * gx); 
-  	
+
   // Normalise quaternion
   recipNorm = invSqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
   q0 *= recipNorm;
@@ -367,21 +369,35 @@ void YPR_Display(void)
     SerialUSB.print(angles[1]);
     SerialUSB.print(" | ");
     SerialUSB.println(angles[2]);  
-    /*
-	AHRSgetValues(data);
-	SerialUSB.print(data[0]);
-	SerialUSB.print(" | ");  
-	SerialUSB.print(data[1]);
-	SerialUSB.print(" | ");  
-	SerialUSB.print(data[2]);
-	SerialUSB.print(" | ");  
-	SerialUSB.print(data[3]);
-	SerialUSB.print(" | ");  
-	SerialUSB.print(data[4]);
-	SerialUSB.print(" | ");  
-	SerialUSB.println(data[5]);
-	*/  
-	delay(100);   
+    delay(100);   
+  }
+}
+
+void YPR_Display_Raw(void)
+{
+  float data[6];
+  delay(5);
+  while(1)
+  {  
+    AHRSgetValues(data);
+    SerialUSB.print(data[0]);
+    SerialUSB.print(" | ");  
+    SerialUSB.print(data[1]);
+    SerialUSB.print(" | ");  
+    SerialUSB.print(data[2]);
+    SerialUSB.print(" | ");  
+    SerialUSB.print(data[3]);
+    SerialUSB.print(" | ");  
+    SerialUSB.print(data[4]);
+    SerialUSB.print(" | ");  
+    SerialUSB.print(data[5]);
+    SerialUSB.print(" | ");  
+    SerialUSB.print(data[6]);
+    SerialUSB.print(" | ");  
+    SerialUSB.print(data[7]);
+    SerialUSB.print(" | ");  
+    SerialUSB.println(data[8]);
+    delay(100);   
   }
 }
 
@@ -405,6 +421,7 @@ void AHRS_Cube(void)
     delay(5);
   }
 }
+
 
 
 

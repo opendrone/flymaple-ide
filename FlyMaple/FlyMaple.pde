@@ -26,7 +26,7 @@ char str[512];
 void setup()
 {
   SerialUSB.begin();
-  
+
   // Initialize the AHRS
   SerialUSB.println("AHRS Initialization...");
   initAHRS();
@@ -43,10 +43,11 @@ void setup()
 void loop()
 {
 
-  // The following method is used to get 3D position for another piece of software. Ask Jose for more information.
+  // The following method is used to get 3D position for processing. Ask Jose for more information.
   //AHRS_Cube();
 
   // Uncomment the following line to display Yaw, Pitch & Roll angles measured by the FlyMaple board
+  //YPR_Display_Raw();  //uncomment to display raw values
   YPR_Display();
 
   // Uncomment the following line to display the values of RF controller input
@@ -65,3 +66,4 @@ void loop()
   //compassTest();
 
 }
+
