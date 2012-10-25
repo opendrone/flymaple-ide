@@ -1,35 +1,34 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////
-//函数原型:  void writeTo(uint8 DEVICE, uint8 address, uint8 val)             	     
-//参数说明:  DEVICE: I2C设备地址
-//           address:操作寄存器地址 
-//           val:写入寄存器值
-//返回值:    无                                                               
-//说明:      通过I2C总线将val写入到对应地址寄存器中
+// Function prototype: void writeTo (uint8 DEVICE uint8 address, uint8 val)
+// Parameter Description: DEVICE: I2C device address
+// Address: Operation register address
+// Val: write register values
+// Return Value: None
+// Description: val is written to the corresponding address register through the I2C bus
 ///////////////////////////////////////////////////////////////////////////////////
 void writeTo(uint8 DEVICE, uint8 address, uint8 val) 
 {
   // all i2c transactions send and receive arrays of i2c_msg objects 
   i2c_msg msgs[1]; // we dont do any bursting here, so we only need one i2c_msg object
- uint8 msg_data[2];
-  
-  msg_data = {address,val};  //写两个数据，一个地址，一个值
+ uint8 msg_data[2] = {address,val};
+ 
   msgs[0].addr = DEVICE;
-  msgs[0].flags = 0; // 写操作
-  msgs[0].length = 2; //写两个数据
+  msgs[0].flags = 0; // write
+  msgs[0].length = 2; //Write two data
   msgs[0].data = msg_data;
   i2c_master_xfer(I2C1, msgs, 1,0);  //
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-//函数原型:  void readFrom(uint8 DEVICE, uint8 address, uint8 num, uint8 *msg_data)              	     
-//参数说明:  DEVICE: I2C设备地址
-//           address:操作寄存器地址 
-//           num:读取数量
-//           *msg_data:读取数据存放指针
-//返回值:    无                                                               
-//说明:      通过I2C总线读取数据
+// Function prototype: void readFrom (the uint8 DEVICE uint8 address, uint8 num, uint8 * msg_data)
+// Parameter Description: DEVICE: I2C device address
+// Address: Operation register address
+// Num: the number of reads
+// * Msg_data: read data stored pointer
+// Return Value: None
+// Description: I2C bus to read data
 ///////////////////////////////////////////////////////////////////////////////////
 void readFrom(uint8 DEVICE, uint8 address, uint8 num, uint8 *msg_data) 
 {
@@ -37,14 +36,14 @@ void readFrom(uint8 DEVICE, uint8 address, uint8 num, uint8 *msg_data)
   msg_data[0] = address;
   
   msgs[0].addr = DEVICE;
-  msgs[0].flags = 0; //标志为0，是写操作
+  msgs[0].flags = 0; //write flag is 0
   msgs[0].length = 1; // just one byte for the address to read, 0x00
   msgs[0].data = msg_data;
   i2c_master_xfer(I2C1, msgs, 1,0);
   
   msgs[0].addr = DEVICE;
-  msgs[0].flags = I2C_MSG_READ; //读取
-  msgs[0].length = num; // 读取字节数
+  msgs[0].flags = I2C_MSG_READ; //read
+  msgs[0].length = num; // Read the number of bytes
   msgs[0].data = msg_data;
   i2c_master_xfer(I2C1, msgs, 1,0);
 }
