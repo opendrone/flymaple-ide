@@ -5,24 +5,20 @@
 
 // This holds the output values that are supposed to be sent to the motors.
 // The values can then be sent by using the motorControl() method. See MOTOR.pde for more information.
-extern uint16 MotorData[6];  //电机控制寄存器 
+extern uint16 MotorData[6];  //Motor control register
 
 // These 4 variables can hold the RF controller input values.
 // See CapturePPM for more information.
-extern volatile unsigned int chan1PPM;  //PPM捕获值寄存器
+extern volatile unsigned int chan1PPM;  //PPM capture value register
 extern volatile unsigned int chan2PPM;
 extern volatile unsigned int chan3PPM;
 extern volatile unsigned int chan4PPM;
 
-
-char str[512]; 
-
-
 ////////////////////////////////////////////////////////////////////////////////////
-//函数原型:  void setup()               	     
-//参数说明:  无                                        
-//返回值:    无                                                               
-//说明:      FlyMaple板 初始化函数
+// Function prototype: void setup ()
+// Parameter Description: None
+// Return Value: None
+// Description: FlyMaple board initialization function
 ///////////////////////////////////////////////////////////////////////////////////
 void setup()
 {
@@ -36,10 +32,10 @@ void setup()
 
 
 ////////////////////////////////////////////////////////////////////////////////////
-//函数原型:  void loop()            	     
-//参数说明:  无                                        
-//返回值:    无                                                               
-//说明:      主函数，程序主循环
+// Function prototype: void loop ()
+// Parameter Description: None
+// Return Value: None
+// Description: The main loop of the main function, the program
 ///////////////////////////////////////////////////////////////////////////////////
 void loop()
 {
