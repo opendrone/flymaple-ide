@@ -55,7 +55,7 @@ void loop()
   //bmp085Test();
 
   // Uncomment the following to test the accelerometer. Works fine.
-  //accelerometerTest();
+  accelerometerTest();
 
   // Uncomment the following to test the gyroscope. Works fine.
   //GyroscopeTest();
