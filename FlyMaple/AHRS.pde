@@ -47,18 +47,19 @@ void initAHRS(void)
   //configure I2C port 1 (pins 5, 9) with no special option flags (second argument)
   i2c_master_enable(I2C1, I2C_FAST_MODE);  //设置I2C1接口，主机模式
 
-
+  delay(200);
+  
   // Accelerometer start
   SerialUSB.println("Initializing the Accelerometer...");
   initAcc();            //初始化加速度计
-  delay(1000);
+  delay(200);
   SerialUSB.println("Initializing the Accelerometer... Done!");
 
 
   // Gyroscope start
   SerialUSB.println("Initializing the Gyroscope...");
   initGyro();           //初始化陀螺仪
-  delay(1000);
+  delay(200);
   SerialUSB.println("Initializing the Gyroscope... Done!");
 
   SerialUSB.println("Calibrating the Gyroscope...");
@@ -113,9 +114,9 @@ void AHRSgetValues(float * values)
   values[2] = valG[2] * M_PI/180;
   int16 valA[3];
   getAccelerometerData(&valA[0]);  //读取 XYZ轴加速度原始数据，然后转换成浮点数
-  values[3] = ((float) valA[0]);
-  values[4] = ((float) valA[1]);
-  values[5] = ((float) valA[2]);
+  values[3] = ((float) valA[0])/256;
+  values[4] = ((float) valA[1])/256;
+  values[5] = ((float) valA[2])/256;
   int16 valC[3];
   compassRead(&valC[0]);
   values[6] = ((float) valC[0]);
@@ -350,9 +351,9 @@ void AHRSgetQ(float * q)
   sampleFreq = 1.0 / ((now - lastUpdate) / 1000000.0);
   lastUpdate = now;
   // 9DOF IMU
-  //AHRSupdate(val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7], val[8]);
+  AHRSupdate(val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7], val[8]);
   // 6DOF IMU
-  AHRSupdate(val[0], val[1], val[2], val[3], val[4], val[5], 0.0f, 0.0f, 0.0f);
+  //AHRSupdate(val[0], val[1], val[2], val[3], val[4], val[5], 0.0f, 0.0f, 0.0f);
   q[0] = q0;
   q[1] = q1;
   q[2] = q2;

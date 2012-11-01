@@ -4,12 +4,12 @@
 #define A_TO_READ (6) //the number of bytes to read(each axis accounted for two-byte)
 #define XL345_DEVID   0xE5 //ADXL345 ID register，需要注意芯片有一个地址选择线将AD0连接到GND口
 // ADXL345 Control register
+#define ADXLREG_TAP_AXES     0x2A
 #define ADXLREG_BW_RATE      0x2C
 #define ADXLREG_POWER_CTL    0x2D
+#define ADXLREG_INT_ENABLE   0x2E
 #define ADXLREG_DATA_FORMAT  0x31
 #define ADXLREG_FIFO_CTL     0x38
-#define ADXLREG_BW_RATE      0x2C
-#define ADXLREG_TAP_AXES     0x2A
 #define ADXLREG_DUR          0x21
 
 //ADXL345 Data register
@@ -58,28 +58,25 @@ void initAcc(void)
     waitForButtonPress(0);
   }
   //invoke ADXL345
-  writeTo(ACC,ADXLREG_DATA_FORMAT,0x08); //Set accelerometer to +/-2g
+  writeTo(ACC,ADXLREG_POWER_CTL,0x00);
   writeTo(ACC,ADXLREG_POWER_CTL,0x08); //Set accelerometer to measure mode
   
-  
+  delay(100);
   // Calculate offset
-  float accumulator[] = {
-    0,0,0    };
-  SerialUSB.print("adding to accumulator ");
-  for(int i = 0 ; i < 100 ; i++) {
+  float accumulator[] = {0,0,0};
+  int num_samples = 30;
+  for(int i = 0 ; i < num_samples ; i++) {
     short acc[3];
     getAccelerometerData(acc);
-    SerialUSB.println(acc[1]);
     accumulator[0] += acc[0];
     accumulator[1] += acc[1];
     accumulator[2] += acc[2];
-    delay(10)  ;
+    delay(100);
   }
-  SerialUSB.print("total value is ");
-  SerialUSB.println(accumulator[1] / 100);
-  for(int i = 0 ; i < 3 ; i++) accumulator[i] /= 100;
-  accumulator[2] -= 500; // 1g at 2mg/LSB more or less.
+  for(int i = 0 ; i < 3 ; i++) accumulator[i] /= num_samples;
+  accumulator[2] += 256; // 1g at 2mg/LSB more or less.
   for(int i = 0 ; i < 3 ; i++) a_offset[i] = accumulator[i];
+  for(int i = 0 ; i < 3 ; i++) SerialUSB.println(accumulator[i]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -101,6 +98,8 @@ void getAccelerometerData(int16 * result)
   result[1] = ((((int16)buff[3]) << 8) | buff[2]) - a_offset[1];
   result[2] = ((((int16)buff[5]) << 8) | buff[4]) - a_offset[2];
 }
+
+
 void accelerometerTest(void)//ADXL345 accelerometer reading test example
 {
   int16 acc[3];
