@@ -66,9 +66,9 @@ float decodeFloat(String inString) {
 
 
 
-void readQ() {
-  if (myPort.available() >= 18) {
-    String inputString = myPort.readStringUntil('\n');
+void serialEvent(Serial p) {
+  if(p.available() >= 18) {
+    String inputString = p.readStringUntil('\n');
     //print(inputString);
     if (inputString != null && inputString.length() > 0) {
       String [] inputStringArr = split(inputString, ",");
@@ -154,8 +154,6 @@ void drawCube() {
 void draw() {
   background(#000000);
   fill(#ffffff);
-
-  readQ();
 
   if (hq != null) { // use home quaternion
     quaternionToEuler(quatProd(hq, q), Euler);
