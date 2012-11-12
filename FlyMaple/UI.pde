@@ -4,7 +4,7 @@ void btnEvent(void);
 void ledEvent(void);
 void setBlink(uint32 pattern);
 
-#define UI_RATE 31250    // in microseconds; should give 32Hz toggles
+#define UI_RATE (31250)    // in microseconds; should give 32Hz toggles
 
 volatile uint32 blinkPattern = 0;
 uint32 blinkBuffer = 0, blinkCount = 0;
@@ -18,8 +18,7 @@ void initUI() {
   pinMode(BOARD_BUTTON_PIN, INPUT);
   //attachInterrupt(0, buttonEvent, CHANGE);
   
-  setBlink(0x00010001);
-
+  //setBlink(0x00010001);
   // Pause the timer while we're configuring it
   timer.pause();
 
@@ -50,12 +49,13 @@ void uiEvent(void) {
 void btnEvent()
 {
   if (btnState)
-    toggleLED();
+    toggleFrameOrientation();
 }
 
 void ledEvent()
 {
-  digitalWrite(BOARD_LED_PIN, (blinkBuffer >>= 1) & 1);
+  digitalWrite(BOARD_LED_PIN, blinkBuffer & 1);
+  blinkBuffer >>= 1; 
   if (++blinkCount % 32 == 0) {
     blinkBuffer = blinkPattern;
   }

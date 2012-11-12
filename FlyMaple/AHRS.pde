@@ -1,3 +1,4 @@
+#include "AHRS.h"
 
 #define twoKpDef  (2.0f * 0.1f) // 2 * proportional gain 两倍比例增益
 #define twoKiDef  (2.0f * 0.1f) // 2 * integral gain    两倍积分增益
@@ -11,6 +12,54 @@ volatile float integralFBx,  integralFBy, integralFBz;
 uint32 lastUpdate, now; // sample period expressed in milliseconds  采样周期变量，单位毫秒
 float sampleFreq; // half the sample period expressed in seconds
 int16 startLoopTime;
+
+// w,x,y,z - quoternion to rotate on yaw axis to 45 degree
+#define YAW_45_DEGREE_FIX (float[4]){0.9238795325112867f, 0.0f, 0.0f, -0.3826834323650897f}
+
+volatile int frameOrientation = FRAME_ORIENTATION_PLUS;
+
+void toggleFrameOrientation()
+{
+  setFrameOrientation(frameOrientation == FRAME_ORIENTATION_X ? FRAME_ORIENTATION_PLUS : FRAME_ORIENTATION_X);
+}
+
+void setFrameOrientation(int orientation)
+{
+  frameOrientation = orientation;
+  if (orientation == FRAME_ORIENTATION_PLUS)
+    setBlink(0x00000001);
+  else
+    setBlink(0x00000101);
+}
+
+void qMult(float * qu1, float * qu2, int doNorm)
+{
+  float norm;
+  float A, B, C, D, E, F, G, H;
+  
+  A = (qu1[0]+qu1[1])*(qu2[0]+qu2[1]);
+  B = (qu1[3]-qu1[2])*(qu2[2]-qu2[3]);
+  C = (qu1[1]-qu1[0])*(qu2[2]+qu2[3]);
+  D = (qu1[2]+qu1[3])*(qu2[1]-qu2[0]);
+  E = (qu1[1]+qu1[3])*(qu2[1]+qu2[2]);
+  F = (qu1[1]-qu1[3])*(qu2[1]-qu2[2]);
+  G = (qu1[0]+qu1[2])*(qu2[0]-qu2[3]);
+  H = (qu1[0]-qu1[2])*(qu2[0]+qu2[3]);
+  
+  qu1[0] =  B + (-E - F + G + H) * 0.5;
+  qu1[1] =  A - ( E + F + G + H) * 0.5;
+  qu1[2] = -C + ( E - F + G - H) * 0.5;
+  qu1[3] = -D + ( E - F - G + H) * 0.5;
+  
+  // Normalise resulted quaternion if needed
+  if (doNorm) {
+    norm = invSqrt(qu1[0] * qu1[0] + qu1[1] * qu1[1] + qu1[2] * qu1[2] + qu1[3] * qu1[3]);
+    qu1[0] *= norm;
+    qu1[1] *= norm;
+    qu1[2] *= norm;
+    qu1[3] *= norm;
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////////
 //函数原型:  void initAHRS(void)       	     
@@ -358,6 +407,9 @@ void AHRSgetQ(float * q)
   q[1] = q1;
   q[2] = q2;
   q[3] = q3;
+  
+  if (frameOrientation == FRAME_ORIENTATION_X)
+    qMult(q, YAW_45_DEGREE_FIX, 0);
 }
 
 // Returns the Euler angles in radians defined with the Aerospace sequence.

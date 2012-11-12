@@ -2,6 +2,7 @@
 #include "wirish.h"
 #include "i2c.h"
 #include "kalman.h"
+#include "AHRS.h"
 
 // This holds the output values that are supposed to be sent to the motors.
 // The values can then be sent by using the motorControl() method. See MOTOR.pde for more information.
@@ -22,10 +23,11 @@ extern volatile unsigned int chan4PPM;
 ///////////////////////////////////////////////////////////////////////////////////
 void setup()
 {
+  setFrameOrientation(FRAME_ORIENTATION_PLUS);
+
   initUI();
   
   SerialUSB.begin();
-
   // Initialize the AHRS
   SerialUSB.println("AHRS Initialization...");
   initAHRS();
