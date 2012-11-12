@@ -2,6 +2,7 @@
 #include "wirish.h"
 #include "i2c.h"
 #include "kalman.h"
+#include "AHRS.h"
 
 // This holds the output values that are supposed to be sent to the motors.
 // The values can then be sent by using the motorControl() method. See MOTOR.pde for more information.
@@ -22,14 +23,16 @@ extern volatile unsigned int chan4PPM;
 ///////////////////////////////////////////////////////////////////////////////////
 void setup()
 {
-  SerialUSB.begin();
+  setFrameOrientation(FRAME_ORIENTATION_PLUS);
 
+  initUI();
+  
+  SerialUSB.begin();
   // Initialize the AHRS
   SerialUSB.println("AHRS Initialization...");
   initAHRS();
   SerialUSB.println("AHRS Initialization... Done!");
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////
 // Function prototype: void loop ()
@@ -43,7 +46,7 @@ void loop()
   //Display_Raw();
 
   // The following method is used to get 3D position for processing. Ask Jose for more information.
-  //AHRS_Cube();
+  AHRS_Cube();
 
   // Uncomment the following line to display Yaw, Pitch & Roll angles measured by the FlyMaple board
   //YPR_Display();
@@ -55,7 +58,7 @@ void loop()
   //bmp085Test();
 
   // Uncomment the following to test the accelerometer. Works fine.
-  accelerometerTest();
+  //accelerometerTest();
 
   // Uncomment the following to test the gyroscope. Works fine.
   //GyroscopeTest();

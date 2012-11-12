@@ -74,7 +74,7 @@ void initAcc(void)
     delay(100);
   }
   for(int i = 0 ; i < 3 ; i++) accumulator[i] /= num_samples;
-  accumulator[2] += 256; // 1g at 2mg/LSB more or less.
+  accumulator[2] -= 256; // 1g at 2mg/LSB more or less.
   for(int i = 0 ; i < 3 ; i++) a_offset[i] = accumulator[i];
   for(int i = 0 ; i < 3 ; i++) SerialUSB.println(accumulator[i]);
 }
