@@ -22,6 +22,8 @@ extern volatile unsigned int chan4PPM;
 ///////////////////////////////////////////////////////////////////////////////////
 void setup()
 {
+  initUI();
+  
   SerialUSB.begin();
 
   // Initialize the AHRS
@@ -29,7 +31,6 @@ void setup()
   initAHRS();
   SerialUSB.println("AHRS Initialization... Done!");
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////
 // Function prototype: void loop ()
@@ -43,7 +44,7 @@ void loop()
   //Display_Raw();
 
   // The following method is used to get 3D position for processing. Ask Jose for more information.
-  //AHRS_Cube();
+  AHRS_Cube();
 
   // Uncomment the following line to display Yaw, Pitch & Roll angles measured by the FlyMaple board
   //YPR_Display();
@@ -55,7 +56,7 @@ void loop()
   //bmp085Test();
 
   // Uncomment the following to test the accelerometer. Works fine.
-  accelerometerTest();
+  //accelerometerTest();
 
   // Uncomment the following to test the gyroscope. Works fine.
   //GyroscopeTest();
